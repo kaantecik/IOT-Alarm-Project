@@ -1,0 +1,79 @@
+{% extends 'layout.html' %}
+{% block body %}
+    <div id="body" class="d-flex align-items-center justify-content-center">
+
+        <div class="col-md-4  mx-auto my-4 list-group">
+            {% include 'messages.html' %}
+            <h1 style="font-weight: bold">Your Alarms</h1>
+            {% if alarms %}
+                <div class="accordion" id="accordionExample">
+                    {% for alarm in alarms|reverse %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="heading{{ loop.index }}">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapse{{ loop.index }}" aria-expanded="false"
+                                        aria-controls="collapse{{ loop.index }}">
+                                    <div class="form-check form-switch">
+                                        <label for="flexSwitchCheckChecked"></label>
+                                        {% if alarm.status == 'on' %}
+                                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked"
+                                                   onchange="set_active('{{ alarm.alarm_id }}')"
+                                                   checked>
+                                        {% else %}
+                                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked"
+                                                   onchange="set_active('{{ alarm.alarm_id }}')">
+                                        {% endif %}
+                                    </div>
+                                    {{ alarm.start_hour }}
+                                </button>
+                            </h2>
+                            <div id="collapse{{ loop.index }}" class="accordion-collapse collapse"
+                                 aria-labelledby="heading{{ loop.index }}"
+                                 data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    <form action="{{ url_for('update_alarm', alarm_id=alarm.alarm_id) }}"
+                                          class="d-flex justify-content-between align-items-center" method="post">
+                                        <label>
+                                            <input type="time"
+                                                   value="{{ alarm.start_hour }}" name="start_hour" required/>
+                                        </label>
+                                        <div class="btn-group ">
+                                            <button class="btn btn-primary btn-sm" type="submit">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                     fill="currentColor" class="bi bi-check-circle-fill"
+                                                     viewBox="0 0 16 16">
+                                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                                </svg>
+                                            </button>
+                                            <a href="{{ url_for('delete_alarm', alarm_id=alarm.alarm_id) }}"
+                                               class="btn btn-danger btn-sm">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                     fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                                    <path fill-rule="evenodd"
+                                                          d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </form>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-warning" role="alert">
+                    <span>It seems you didn't create alarm. <a
+                            href="{{ url_for('home_page') }}">Create</a> new one.</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <script>
+        const set_active = (alarm_id) => {
+            axios.get("http://localhost:5000/alarm/toggle/"+alarm_id)
+        }
+    </script>
+{% endblock %}

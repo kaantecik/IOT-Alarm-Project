@@ -1,0 +1,4 @@
+flask
+pyrebase
+datetime
+flask-cors
